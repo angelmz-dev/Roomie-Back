@@ -54,12 +54,13 @@ export class UserController {
             });
         }
     };
-    // Nuevo método para el Login
+
+    // Método para el Login de usuario
     public login = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
 
-            // 1. Validación defensiva en la frontera HTTP
+            // 1. Validación defensiva en la frontera HTTP (Fail-Fast)
             if (!email || !password) {
                 res.status(400).json({
                     success: false,
@@ -68,24 +69,24 @@ export class UserController {
                 return;
             }
 
-            // 2. Construcción del DTO
+            // 2. Mapeo hacia el DTO de la capa de Aplicación
             const dto: LoginUserDTO = {
                 email,
                 passwordText: password,
             };
 
-            // 3. Ejecución de la lógica de negocio pura
+            // 3. Ejecución del Caso de Uso
             const response = await this.loginUserUseCase.execute(dto);
 
-            // 4. Respuesta HTTP 200 OK con el JWT
+            // 4. Respuesta HTTP 200 OK con el Token y datos del usuario
             res.status(200).json({
                 success: true,
                 message: 'Autenticación exitosa',
-                data: response, // Contiene { token, user }
+                data: response,
             });
         } catch (error: unknown) {
-            // Capturamos el error "Credenciales inválidas" del Use Case
-            const errorMessage = error instanceof Error ? error.message : 'Error en la autenticación';
+            const errorMessage =
+                error instanceof Error ? error.message : 'Error en la autenticación';
 
             res.status(401).json({
                 success: false,
