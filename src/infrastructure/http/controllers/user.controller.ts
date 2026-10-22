@@ -4,6 +4,7 @@ import { RegisterUserUseCase } from '../../../application/use-cases/register-use
 import { LoginUserUseCase } from '../../../application/use-cases/login-user.use-case.js';
 import type { RegisterUserDTO } from '../../../application/dtos/register-user.dto.js';
 import type { LoginUserDTO } from '../../../application/dtos/login-user.dto.js';
+
 export class UserController {
     constructor(
         private readonly registerUserUseCase: RegisterUserUseCase,
