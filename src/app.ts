@@ -1,28 +1,27 @@
 // src/app.ts
-import dotenv from 'dotenv'; //necesario para cargar las variables de entorno
-import express, { type Application } from 'express'; //el compilador exige que ue los tipos puros se importen con la palabra clave type
-import cors from 'cors'; //necesario para que el frontend pueda comunicarse con el backend -> npm install --save-dev @types/cors
+import express, { type Application, type Request, type Response } from 'express';
+import cors from 'cors';
 import { userRoutes } from './infrastructure/http/routes/user.routes.js';
-
-// Cargar variables de entorno (.env)
-dotenv.config();
+import { profileRoutes } from './infrastructure/http/routes/profile.routes.js';
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
 
-// Middlewares globales de infraestructura
+// 1. Middlewares globales de seguridad y parseo
 app.use(cors());
-app.use(express.json()); // Permite a Express parsear JSON en el body de las peticiones
+app.use(express.json());
 
-app.use('/api/users', userRoutes)
+// 2. Rutas de la API (Inyección de nuestros módulos)
+app.use('/api/users', userRoutes);
 
-// Ruta de diagnóstico básica
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'OK', message: 'RoomieMatch API corriendo exitosamente' });
+app.use('/api/profiles', profileRoutes);
+// 3. Health Check para verificar el estado del backend
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'OK',
+    service: 'RoomieMatch API - Querétaro',
+    timestamp: new Date().toISOString(),
+  });
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor de RoomieMatch inicializado en http://localhost:${PORT}`);
-});
-
-export default app;
+// Exportación nombrada para ser consumida por server.ts o por tests
+export { app };
