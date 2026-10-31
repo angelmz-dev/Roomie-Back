@@ -23,5 +23,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// Exportación nombrada para ser consumida por server.ts o por tests
 export { app };
+export default app;
+
