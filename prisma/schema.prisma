@@ -18,6 +18,12 @@ model User {
   
   // Relación 1:1 con el perfil de estilo de vida
   profile      LifestyleProfile? 
+  
+  // Relaciones inversas generadas para Interaction y Match
+  sentInteractions     Interaction[] @relation("SentInteractions")
+  receivedInteractions Interaction[] @relation("ReceivedInteractions")
+  matchesUser1         Match[]       @relation("MatchesAsUser1")
+  matchesUser2         Match[]       @relation("MatchesAsUser2")
 }
 
 model LifestyleProfile {
@@ -43,4 +49,36 @@ model LifestyleProfile {
   
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+enum InteractionType {
+  LIKE
+  DISLIKE
+}
+
+model Interaction {
+  id          String          @id @default(uuid())
+  fromUserId  String
+  toUserId    String
+  type        InteractionType
+  createdAt   DateTime        @default(now())
+
+  fromUser    User @relation("SentInteractions", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser      User @relation("ReceivedInteractions", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  // Índice compuesto único: Un usuario solo puede evaluar a otro una sola vez
+  @@unique([fromUserId, toUserId]) 
+}
+
+model Match {
+  id        String   @id @default(uuid())
+  user1Id   String
+  user2Id   String
+  createdAt DateTime @default(now())
+
+  user1     User @relation("MatchesAsUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User @relation("MatchesAsUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  // Índice compuesto único para evitar matches duplicados entre las mismas dos personas
+  @@unique([user1Id, user2Id])
 }
