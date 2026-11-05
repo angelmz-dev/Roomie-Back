@@ -10,4 +10,7 @@ export interface CreateLifestyleProfileDTO {
   toleratesSmokers: boolean;
   bio?: string;
 }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
