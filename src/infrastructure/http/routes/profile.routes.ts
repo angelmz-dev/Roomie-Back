@@ -3,6 +3,8 @@ import { Router } from 'express';
 import { ProfileController } from '../controllers/profile.controller.js';
 import { PrismaLifestyleProfileRepository } from '../../repositories/prisma-lifestyle.repository.js';
 import { CreateLifestyleProfileUseCase } from '../../../application/use-cases/create-lifestyle-profile.use-case.js';
+import { GetMyLifestyleProfileUseCase } from '../../../application/use-cases/get-my-lifestyle-profile.use-case.js';
+import { UpdateLifestyleProfileUseCase } from '../../../application/use-cases/update-lifestyle-profile.use-case.js';
 import { jwtAuthMiddleware } from '../middlewares/jwt-auth.middleware.js';
 
 const router = Router();
@@ -10,10 +12,18 @@ const router = Router();
 // --- Ensamblaje de Dependencias (Composition Root) ---
 const profileRepository = new PrismaLifestyleProfileRepository();
 const createProfileUseCase = new CreateLifestyleProfileUseCase(profileRepository);
-const profileController = new ProfileController(createProfileUseCase);
+const getMyProfileUseCase = new GetMyLifestyleProfileUseCase(profileRepository);
+const updateProfileUseCase = new UpdateLifestyleProfileUseCase(profileRepository);
+const profileController = new ProfileController(
+    createProfileUseCase,
+    getMyProfileUseCase,
+    updateProfileUseCase,
+);
 
 // --- Definición de Rutas Privadas ---
 // Inyectamos jwtAuthMiddleware directamente antes del controlador
 router.post('/', jwtAuthMiddleware, profileController.create);
+router.get('/me', jwtAuthMiddleware, profileController.getMyProfile);
+router.patch('/me', jwtAuthMiddleware, profileController.updateMyProfile);
 
 export { router as profileRoutes };

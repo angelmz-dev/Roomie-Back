@@ -58,4 +58,35 @@ export class PrismaLifestyleProfileRepository implements ILifestyleProfileReposi
             profile.updatedAt
         );
     }
+
+    public async update(profile: LifestyleProfileEntity): Promise<LifestyleProfileEntity> {
+        const updated = await prisma.lifestyleProfile.update({
+            where: { userId: profile.userId },
+            data: {
+                minBudget: profile.minBudget,
+                maxBudget: profile.maxBudget,
+                preferredZones: profile.preferredZones,
+                hasPets: profile.hasPets,
+                toleratesPets: profile.toleratesPets,
+                isSmoker: profile.isSmoker,
+                toleratesSmokers: profile.toleratesSmokers,
+                bio: profile.bio,
+            },
+        });
+
+        return new LifestyleProfileEntity(
+            updated.id,
+            updated.userId,
+            updated.minBudget,
+            updated.maxBudget,
+            updated.preferredZones,
+            updated.hasPets,
+            updated.toleratesPets,
+            updated.isSmoker,
+            updated.toleratesSmokers,
+            updated.bio,
+            updated.createdAt,
+            updated.updatedAt
+        );
+    }
 }
