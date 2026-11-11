@@ -4,7 +4,6 @@ import { LifestyleProfileEntity } from '../../domain/entities/lifestyle-profile.
 import { prisma } from '../database/prisma.client.js';
 
 export class PrismaDiscoveryRepository implements IDiscoveryRepository {
-
     public async findCompatibleProfiles(
         currentUserId: string,
         zones: string[],
@@ -12,24 +11,28 @@ export class PrismaDiscoveryRepository implements IDiscoveryRepository {
         skip: number,
         take: number
     ): Promise<LifestyleProfileEntity[]> {
-
-        // Consulta a PostgreSQL optimizada para Discovery
         const profiles = await prisma.lifestyleProfile.findMany({
             where: {
-                // 1. Excluir al usuario actual (no puede hacerse match a sí mismo)
+                // 1. No mostrarse a sí mismo
                 userId: { not: currentUserId },
-                // 2. Intersección de zonas: El candidato debe querer vivir en al menos una de las zonas que busco
+                // 2. Coincidencia en al menos una zona de Querétaro
                 preferredZones: { hasSome: zones },
-                // 3. Viabilidad económica: El presupuesto mínimo del candidato debe ser <= a mi máximo
+                // 3. Presupuesto compatible
                 minBudget: { lte: maxBudget },
+                // 4. NUEVO: Excluir usuarios a los que el usuario actual ya les dio LIKE o DISLIKE
+                user: {
+                    receivedInteractions: {
+                        none: {
+                            fromUserId: currentUserId,
+                        },
+                    },
+                },
             },
             skip,
             take,
-            // Ordenamos por los perfiles creados más recientemente
             orderBy: { createdAt: 'desc' },
         });
 
-        // Mapeo hacia la entidad pura de dominio
         return profiles.map(
             (p) =>
                 new LifestyleProfileEntity(
