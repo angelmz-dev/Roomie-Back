@@ -9,4 +9,5 @@ export interface UpdateLifestyleProfileDTO {
     isSmoker?: boolean;
     toleratesSmokers?: boolean;
     bio?: string | null;
+    avatarUrl?: string | null;
 }

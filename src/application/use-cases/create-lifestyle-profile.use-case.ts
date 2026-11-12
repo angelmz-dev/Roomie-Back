@@ -26,6 +26,7 @@ export class CreateLifestyleProfileUseCase {
             dto.isSmoker,
             dto.toleratesSmokers,
             dto.bio || null,
+            dto.avatarUrl ?? null,
             new Date(),
             new Date()
         );

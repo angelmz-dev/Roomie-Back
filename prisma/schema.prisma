@@ -26,26 +26,24 @@ model User {
   matchesUser2         Match[]       @relation("MatchesAsUser2")
 }
 
+
 model LifestyleProfile {
   id               String   @id @default(uuid())
   userId           String   @unique
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Presupuesto mensual en MXN
   minBudget        Float
   maxBudget        Float
-  
-  // Zonas de preferencia en Querétaro (Array de strings)
   preferredZones   String[]
   
-  // Hábitos y preferencias de convivencia
   hasPets          Boolean  @default(false)
   toleratesPets    Boolean  @default(true)
   isSmoker         Boolean  @default(false)
   toleratesSmokers Boolean  @default(false)
-  
-  // Biografía corta para el feed
   bio              String?  @db.Text
+  
+  // NUEVO: URL segura alojada en Cloudinary
+  avatarUrl        String?  
   
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
