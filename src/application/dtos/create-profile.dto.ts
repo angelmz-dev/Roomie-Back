@@ -9,4 +9,6 @@ export interface CreateLifestyleProfileDTO {
   isSmoker: boolean;
   toleratesSmokers: boolean;
   bio?: string;
+  avatarUrl?: string | null;
 }
+

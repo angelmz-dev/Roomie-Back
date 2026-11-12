@@ -25,6 +25,7 @@ export class UpdateLifestyleProfileUseCase {
             dto.isSmoker ?? existingProfile.isSmoker,
             dto.toleratesSmokers ?? existingProfile.toleratesSmokers,
             dto.bio !== undefined ? dto.bio : existingProfile.bio,
+            dto.avatarUrl !== undefined ? dto.avatarUrl : existingProfile.avatarUrl,
             existingProfile.createdAt,
             new Date()
         );

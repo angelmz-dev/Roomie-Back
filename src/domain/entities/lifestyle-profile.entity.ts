@@ -12,6 +12,7 @@ export class LifestyleProfileEntity {
         public isSmoker: boolean,
         public toleratesSmokers: boolean,
         public bio: string | null,
+        public avatarUrl: string | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date
     ) {

@@ -1,4 +1,4 @@
-// src/infrastructure/repositories/prisma-lifestyle-profile.repository.ts
+// src/infrastructure/repositories/prisma-lifestyle.repository.ts
 import type { ILifestyleProfileRepository } from '../../domain/repositories/lifestyle-profile.repository.interface.js';
 import { LifestyleProfileEntity } from '../../domain/entities/lifestyle-profile.entity.js';
 import { prisma } from '../database/prisma.client.js';
@@ -17,6 +17,7 @@ export class PrismaLifestyleProfileRepository implements ILifestyleProfileReposi
                 isSmoker: profile.isSmoker,
                 toleratesSmokers: profile.toleratesSmokers,
                 bio: profile.bio,
+                avatarUrl: profile.avatarUrl,
             },
         });
 
@@ -31,6 +32,7 @@ export class PrismaLifestyleProfileRepository implements ILifestyleProfileReposi
             savedProfile.isSmoker,
             savedProfile.toleratesSmokers,
             savedProfile.bio,
+            savedProfile.avatarUrl,
             savedProfile.createdAt,
             savedProfile.updatedAt
         );
@@ -54,6 +56,7 @@ export class PrismaLifestyleProfileRepository implements ILifestyleProfileReposi
             profile.isSmoker,
             profile.toleratesSmokers,
             profile.bio,
+            profile.avatarUrl,
             profile.createdAt,
             profile.updatedAt
         );
@@ -71,6 +74,7 @@ export class PrismaLifestyleProfileRepository implements ILifestyleProfileReposi
                 isSmoker: profile.isSmoker,
                 toleratesSmokers: profile.toleratesSmokers,
                 bio: profile.bio,
+                avatarUrl: profile.avatarUrl,
             },
         });
 
@@ -85,6 +89,7 @@ export class PrismaLifestyleProfileRepository implements ILifestyleProfileReposi
             updated.isSmoker,
             updated.toleratesSmokers,
             updated.bio,
+            updated.avatarUrl,
             updated.createdAt,
             updated.updatedAt
         );

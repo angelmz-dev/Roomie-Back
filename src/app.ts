@@ -1,4 +1,5 @@
 // src/app.ts
+import 'dotenv/config';
 import express, { type Application, type Request, type Response } from 'express';
 import cors from 'cors';
 import { userRoutes } from './infrastructure/http/routes/user.routes.js';

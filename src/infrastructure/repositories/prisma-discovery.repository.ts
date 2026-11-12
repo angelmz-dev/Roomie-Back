@@ -46,6 +46,7 @@ export class PrismaDiscoveryRepository implements IDiscoveryRepository {
                     p.isSmoker,
                     p.toleratesSmokers,
                     p.bio,
+                    p.avatarUrl,
                     p.createdAt,
                     p.updatedAt
                 )
