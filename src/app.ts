@@ -1,23 +1,34 @@
 // src/app.ts
-import express, { type Application } from 'express'; //el compilador exige que ue los tipos puros se importen con la palabra clave type
-import cors from 'cors'; //necesario para que el frontend pueda comunicarse con el backend -> npm install --save-dev @types/cors
-import dotenv from 'dotenv'; //necesario para cargar las variables de entorno
-
-// Cargar variables de entorno (.env)
-dotenv.config();
-
+import 'dotenv/config';
+import express, { type Application, type Request, type Response } from 'express';
+import cors from 'cors';
+import { userRoutes } from './infrastructure/http/routes/user.routes.js';
+import { profileRoutes } from './infrastructure/http/routes/profile.routes.js';
+import { discoveryRoutes } from './infrastructure/http/routes/discovery.routes.js';
+import { interactionRoutes } from './infrastructure/http/routes/interaction.routes.js';
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
 
-// Middlewares globales de infraestructura
+// 1. Middlewares globales de seguridad y parseo
 app.use(cors());
-app.use(express.json()); // Permite a Express parsear JSON en el body de las peticiones
+app.use(express.json());
 
-// Ruta de diagnóstico básica
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'OK', message: 'RoomieMatch API corriendo exitosamente' });
+// 2. Rutas de la API (Inyección de nuestros módulos)
+app.use('/api/users', userRoutes);
+
+app.use('/api/profiles', profileRoutes);
+// Nuevo módulo inyectado
+app.use('/api/discovery', discoveryRoutes);
+//nuevo modulo
+app.use('/api/interactions', interactionRoutes);
+// 3. Health Check para verificar el estado del backend
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'OK',
+    service: 'RoomieMatch API - Querétaro',
+    timestamp: new Date().toISOString(),
+  });
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor de RoomieMatch inicializado en http://localhost:${PORT}`);
-});
+export { app };
+export default app;
+
