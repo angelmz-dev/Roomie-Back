@@ -18,6 +18,16 @@ export class PrismaMatchRepository implements IMatchRepository {
         return new MatchEntity(match.id, match.user1Id, match.user2Id, match.createdAt);
     }
 
+    public async findById(matchId: string): Promise<MatchEntity | null> {
+        const match = await prisma.match.findUnique({
+            where: { id: matchId },
+        });
+
+        if (!match) return null;
+
+        return new MatchEntity(match.id, match.user1Id, match.user2Id, match.createdAt);
+    }
+
     public async findMatchesByUserId(userId: string): Promise<MatchWithUserDetails[]> {
         const matches = await prisma.match.findMany({
             where: {

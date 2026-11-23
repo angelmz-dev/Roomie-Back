@@ -24,6 +24,9 @@ model User {
   receivedInteractions Interaction[] @relation("ReceivedInteractions")
   matchesUser1         Match[]       @relation("MatchesAsUser1")
   matchesUser2         Match[]       @relation("MatchesAsUser2")
+
+  // Agrega esta línea para cerrar la relación con ChatMessage:
+  sentMessages ChatMessage[] @relation("UserSentMessages")
 }
 
 
@@ -69,14 +72,31 @@ model Interaction {
 }
 
 model Match {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid())
   user1Id   String
   user2Id   String
+  createdAt DateTime      @default(now())
+
+  user1     User          @relation("MatchesAsUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User          @relation("MatchesAsUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  
+  // Relación 1:N con los mensajes del chat
+  messages  ChatMessage[]
+
+  @@unique([user1Id, user2Id])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  matchId   String
+  senderId  String
+  content   String   @db.Text
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user1     User @relation("MatchesAsUser1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2     User @relation("MatchesAsUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  sender    User     @relation("UserSentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
-  // Índice compuesto único para evitar matches duplicados entre las mismas dos personas
-  @@unique([user1Id, user2Id])
+  // Índice de alto rendimiento para cargar el historial del chat cronológicamente
+  @@index([matchId, createdAt])
 }

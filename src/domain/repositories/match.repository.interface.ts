@@ -16,6 +16,8 @@ export interface MatchWithUserDetails {
 
 export interface IMatchRepository {
     create(user1Id: string, user2Id: string): Promise<MatchEntity>;
-    // Nuevo contrato para listar los matches de un usuario
+    // Listar los matches de un usuario
     findMatchesByUserId(userId: string): Promise<MatchWithUserDetails[]>;
+    // Validar pertenencia al Match antes de chatear
+    findById(matchId: string): Promise<MatchEntity | null>;
 }
