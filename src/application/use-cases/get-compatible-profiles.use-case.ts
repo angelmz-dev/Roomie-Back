@@ -1,7 +1,9 @@
 // src/application/use-cases/get-compatible-profiles.use-case.ts
-import type { IDiscoveryRepository } from '../../domain/repositories/discovery.repository.interface.js';
+import type {
+    DiscoveryCandidate,
+    IDiscoveryRepository,
+} from '../../domain/repositories/discovery.repository.interface.js';
 import type { ILifestyleProfileRepository } from '../../domain/repositories/lifestyle-profile.repository.interface.js';
-import { LifestyleProfileEntity } from '../../domain/entities/lifestyle-profile.entity.js';
 import type { PaginationDTO } from '../dtos/pagination.dto.js';
 
 export class GetCompatibleProfilesUseCase {
@@ -10,7 +12,10 @@ export class GetCompatibleProfilesUseCase {
         private readonly profileRepository: ILifestyleProfileRepository // Reutilizamos el puerto del módulo anterior
     ) { }
 
-    public async execute(currentUserId: string, pagination: PaginationDTO): Promise<LifestyleProfileEntity[]> {
+    public async execute(
+        currentUserId: string,
+        pagination: PaginationDTO
+    ): Promise<DiscoveryCandidate[]> {
         // 1. Obtener el perfil del usuario actual para conocer sus filtros
         const currentProfile = await this.profileRepository.findByUserId(currentUserId);
 

@@ -1,5 +1,21 @@
 // src/domain/repositories/discovery.repository.interface.ts
-import { LifestyleProfileEntity } from '../entities/lifestyle-profile.entity.js';
+
+export interface DiscoveryCandidate {
+    id: string;
+    userId: string;
+    fullName: string;
+    minBudget: number;
+    maxBudget: number;
+    preferredZones: string[];
+    hasPets: boolean;
+    toleratesPets: boolean;
+    isSmoker: boolean;
+    toleratesSmokers: boolean;
+    bio: string | null;
+    avatarUrl: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
 export interface IDiscoveryRepository {
     /**
@@ -16,5 +32,5 @@ export interface IDiscoveryRepository {
         maxBudget: number,
         skip: number,
         take: number
-    ): Promise<LifestyleProfileEntity[]>;
+    ): Promise<DiscoveryCandidate[]>;
 }
