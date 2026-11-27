@@ -8,9 +8,11 @@ export interface MatchWithUserDetails {
     matchedUser: {
         id: string;
         fullName: string;
-        email: string;
+        avatarUrl: string | null;
+        minBudget: number | null;
+        maxBudget: number | null;
         preferredZones: string[];
-        maxBudget: number;
+        bio: string | null;
     };
 }
 
