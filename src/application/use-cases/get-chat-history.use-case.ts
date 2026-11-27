@@ -1,8 +1,15 @@
 // src/application/use-cases/get-chat-history.use-case.ts
-import type { IChatMessageRepository } from '../../domain/repositories/chat-message.repository.interface.js';
+import type {
+    ChatHistoryCursor,
+    ChatHistoryPageResult,
+    IChatMessageRepository,
+} from '../../domain/repositories/chat-message.repository.interface.js';
 import type { IMatchRepository } from '../../domain/repositories/match.repository.interface.js';
-import { ChatMessageEntity } from '../../domain/entities/chat-message.entity.js';
 import type { PaginationDTO } from '../dtos/pagination.dto.js';
+
+export interface GetChatHistoryParams extends PaginationDTO {
+    cursor?: ChatHistoryCursor;
+}
 
 export class GetChatHistoryUseCase {
     constructor(
@@ -13,8 +20,8 @@ export class GetChatHistoryUseCase {
     public async execute(
         matchId: string,
         requestingUserId: string,
-        pagination: PaginationDTO
-    ): Promise<ChatMessageEntity[]> {
+        params: GetChatHistoryParams
+    ): Promise<ChatHistoryPageResult> {
         const match = await this.matchRepository.findById(matchId);
         if (!match) {
             throw new Error('El Match especificado no existe.');
@@ -27,7 +34,11 @@ export class GetChatHistoryUseCase {
             throw new Error('No tienes permiso para consultar esta conversación.');
         }
 
-        const skip = (pagination.page - 1) * pagination.limit;
-        return await this.chatMessageRepository.findByMatchId(matchId, skip, pagination.limit);
+        const skip = (params.page - 1) * params.limit;
+        return await this.chatMessageRepository.findByMatchId(matchId, {
+            skip,
+            take: params.limit,
+            ...(params.cursor ? { cursor: params.cursor } : {}),
+        });
     }
 }

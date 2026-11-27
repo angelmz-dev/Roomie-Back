@@ -1,6 +1,10 @@
 // src/infrastructure/repositories/prisma-chat-message.repository.ts
 import { prisma } from '../database/prisma.client.js';
-import type { IChatMessageRepository } from '../../domain/repositories/chat-message.repository.interface.js';
+import type {
+    ChatHistoryPageResult,
+    ChatHistoryQueryOptions,
+    IChatMessageRepository,
+} from '../../domain/repositories/chat-message.repository.interface.js';
 import { ChatMessageEntity } from '../../domain/entities/chat-message.entity.js';
 
 export class PrismaChatMessageRepository implements IChatMessageRepository {
@@ -28,18 +32,35 @@ export class PrismaChatMessageRepository implements IChatMessageRepository {
 
     public async findByMatchId(
         matchId: string,
-        skip: number,
-        take: number
-    ): Promise<ChatMessageEntity[]> {
-        // Traemos los más recientes primero para paginar bien, luego el front (o aquí con .reverse()) los ordena cronológicamente
-        const messages = await prisma.chatMessage.findMany({
-            where: { matchId },
-            orderBy: { createdAt: 'desc' },
-            skip,
-            take,
+        options: ChatHistoryQueryOptions
+    ): Promise<ChatHistoryPageResult> {
+        const { skip, take, cursor } = options;
+
+        const whereClause = cursor
+            ? {
+                  matchId,
+                  OR: [
+                      { createdAt: { lt: cursor.before } },
+                      {
+                          createdAt: { equals: cursor.before },
+                          id: { lt: cursor.beforeId },
+                      },
+                  ],
+              }
+            : { matchId };
+
+        // Orden descendente determinista por (createdAt, id) para paginar hacia atrás sin pérdidas
+        const rows = await prisma.chatMessage.findMany({
+            where: whereClause,
+            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+            ...(cursor ? {} : { skip }),
+            take: take + 1,
         });
 
-        return messages
+        const hasMore = rows.length > take;
+        const pageRows = hasMore ? rows.slice(0, take) : rows;
+
+        const messages = pageRows
             .map(
                 (m) =>
                     new ChatMessageEntity(
@@ -52,5 +73,7 @@ export class PrismaChatMessageRepository implements IChatMessageRepository {
                     )
             )
             .reverse();
+
+        return { messages, hasMore };
     }
 }

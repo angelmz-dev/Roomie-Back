@@ -6,6 +6,7 @@ import { userRoutes } from './infrastructure/http/routes/user.routes.js';
 import { profileRoutes } from './infrastructure/http/routes/profile.routes.js';
 import { discoveryRoutes } from './infrastructure/http/routes/discovery.routes.js';
 import { interactionRoutes } from './infrastructure/http/routes/interaction.routes.js';
+import { chatRoutes } from './infrastructure/http/routes/chat.routes.js';
 const app: Application = express();
 
 // 1. Middlewares globales de seguridad y parseo
@@ -20,6 +21,8 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/discovery', discoveryRoutes);
 //nuevo modulo
 app.use('/api/interactions', interactionRoutes);
+//nuevo modulo 
+app.use('/api/chat', chatRoutes);
 // 3. Health Check para verificar el estado del backend
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({
