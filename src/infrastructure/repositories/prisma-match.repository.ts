@@ -3,6 +3,20 @@ import type { IMatchRepository, MatchWithUserDetails } from '../../domain/reposi
 import { MatchEntity } from '../../domain/entities/match.entity.js';
 import { prisma } from '../database/prisma.client.js';
 
+const MATCHED_USER_SELECT = {
+    id: true,
+    fullName: true,
+    profile: {
+        select: {
+            avatarUrl: true,
+            minBudget: true,
+            maxBudget: true,
+            preferredZones: true,
+            bio: true,
+        },
+    },
+} as const;
+
 export class PrismaMatchRepository implements IMatchRepository {
     public async create(user1Id: string, user2Id: string): Promise<MatchEntity> {
         // Tupla ternaria para garantizar tipado estricto (evita string | undefined con noUncheckedIndexedAccess)
@@ -33,16 +47,20 @@ export class PrismaMatchRepository implements IMatchRepository {
             where: {
                 OR: [{ user1Id: userId }, { user2Id: userId }],
             },
-            include: {
-                user1: { include: { profile: true } },
-                user2: { include: { profile: true } },
+            select: {
+                id: true,
+                user1Id: true,
+                createdAt: true,
+                user1: { select: MATCHED_USER_SELECT },
+                user2: { select: MATCHED_USER_SELECT },
             },
             orderBy: { createdAt: 'desc' },
         });
 
-        // Mapeamos para devolver siempre los datos del "otro" roomie, no los del usuario actual
+        // Mapeamos para devolver siempre los datos públicos del "otro" roomie
         return matches.map((m) => {
             const otherUser = m.user1Id === userId ? m.user2 : m.user1;
+            const profile = otherUser.profile;
 
             return {
                 matchId: m.id,
@@ -50,9 +68,11 @@ export class PrismaMatchRepository implements IMatchRepository {
                 matchedUser: {
                     id: otherUser.id,
                     fullName: otherUser.fullName,
-                    email: otherUser.email,
-                    preferredZones: otherUser.profile?.preferredZones ?? [],
-                    maxBudget: otherUser.profile?.maxBudget ?? 0,
+                    avatarUrl: profile?.avatarUrl ?? null,
+                    minBudget: profile?.minBudget ?? null,
+                    maxBudget: profile?.maxBudget ?? null,
+                    preferredZones: profile?.preferredZones ?? [],
+                    bio: profile?.bio ?? null,
                 },
             };
         });
